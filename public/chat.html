@@ -1,0 +1,105 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="no"/>
+    <meta name="format-detection" content="telephone=no">
+</head>
+<body>
+<div id="wap">
+  
+  <div style="margin-top:20px">
+        <button class="btn">创建名字</button>
+        <input class="txt" type="text" />
+  </div>
+  <div style="margin-top:20px">
+        <button class="mbtn">发送</button>
+        <input class="mtxt" type="text" />
+  </div>
+  <div style="margin-top:20px">
+    <button class="zbtn">找人聊</button>
+    <input class="ztxt" type="text" />
+</div>
+
+  <div style="margin-top:20px">
+    <button class="out">退出</button>
+</div>
+ 
+</div>
+<script src="https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js"></script>
+<script src="https://cdn.bootcss.com/socket.io/2.0.3/socket.io.js"></script>
+<script>
+
+    let param = (function(){
+        var urlParams;
+            var match,
+            pl = /\+/g,
+            search = /([^&=]+)=?([^&]*)/g,
+            decode = function(s) {
+            return decodeURIComponent(s.replace(pl, " "));
+            },
+            query = window.location.search.substring(1);
+            urlParams = {};
+            while (match = search.exec(query))
+            urlParams[decode(match[1])] = decode(match[2]);
+            return urlParams;
+    })();
+
+   // var _ip = "ws://local.hunliji.com:3000/"+param.room;
+    var socket=io.connect();
+
+    var id;
+  
+     socket.on('sys', function (res) {
+      console.log('sys:',res)
+      //socket.broadcast.emit('userChat', res);
+    });
+
+     socket.on('online', function (res) {
+      console.log('房间在线人列表:',res)
+      //socket.broadcast.emit('userChat', res);
+    });
+
+    socket.on('data', function (res) {
+        if(res.online){
+            console.log('data:',res)
+        }else{
+            console.log('私聊信息:',res)
+        }
+      
+    });
+    
+    $(document).on('click','.btn',function(){
+        var _txt = $('.txt').val();
+        socket.emit("join", _txt);
+    })
+
+    $(document).on('click','.mbtn',function(){
+        var _txt = $('.mtxt').val();console.log("id:",id)
+        if(id){
+
+            socket.emit("private", {id:id,msg:_txt});
+        }else{
+            socket.emit("message", _txt);
+        }
+        
+    })
+
+    $(document).on('click','.out',function(){
+        socket.emit("leave");
+    })
+
+    $(document).on('click','.zbtn',function(){
+        id = $('.ztxt').val();
+        
+    })
+    
+
+</script>
+
+</body>
+</html>

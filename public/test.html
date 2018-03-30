@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="keywords" content=""/>
+    <meta name="description" content=""/>
+    <meta name="apple-mobile-web-app-capable" content="no"/>
+    <meta name="format-detection" content="telephone=no">
+</head>
+<body>
+<div id="wap">
+  
+
+ <div style="padding:20px;background:#ddd;margin:20px;">
+
+    <form onsubmit="return false;" id="yyy">
+        <p id="call">外呼号码<input type="text" name="mobile" /> <input type="button" value="外呼" name="buttonCall" />
+        </p> </form>
+
+ </div>
+
+  <div style="margin-top:20px">
+        <button class="btn">点击</button>
+        <input class="txt" type="text" />
+  </div>
+ 
+</div>
+<script src="//ocafkzd89.qnssl.com/zepto.min.js"></script>
+<script src="https://cdn.bootcss.com/socket.io/2.0.3/socket.io.js"></script>
+<script>
+    document.getElementById('yyy').buttonCall.onclick = function() {
+if (!form.mobile.value) return alert('请输入电话号码');
+qiConnect.call(form.mobile.value); }
+</script>
+<script>
+
+    let param = (function(){
+        var urlParams;
+            var match,
+            pl = /\+/g,
+            search = /([^&=]+)=?([^&]*)/g,
+            decode = function(s) {
+            return decodeURIComponent(s.replace(pl, " "));
+            },
+            query = window.location.search.substring(1);
+            urlParams = {};
+            while (match = search.exec(query))
+            urlParams[decode(match[1])] = decode(match[2]);
+            return urlParams;
+    })();
+
+    var _ip = "ws://local.hunliji.com:3000/"+param.room;
+    var socket=io.connect(_ip);
+
+     socket.on('userChat', function (res) {
+      socket.name = res;
+      console.log('userChat:',socket.name)
+      //socket.broadcast.emit('userChat', res);
+    });
+    
+    $(document).on('click','.btn',function(){
+        var _txt = $('.txt').val();
+        console.log('click:',_txt)
+        socket.emit('name',_txt);
+    })
+
+    
+
+</script>
+
+</body>
+</html>
